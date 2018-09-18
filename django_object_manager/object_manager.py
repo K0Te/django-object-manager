@@ -89,9 +89,6 @@ class ObjectManager:
                 if params[field.name] is None:
                     continue
                 for (converter_type, converter) in self._converters.items():
-                    print('###: ', field.name)
-                    print('### Field type: ', type(field))
-                    print('### Converter type: ', converter_type)
                     if isinstance(field, converter_type):
                         params[field.name] = converter(field,
                                                        params[field.name])
@@ -121,7 +118,6 @@ class ObjectManager:
             return instance
         post_add = self._create_dependencies(model, kwargs)
         if _create_in_db:
-            print('###, db: ', kwargs)
             instance = model(**kwargs)
             instance.save(force_insert=True)
         else:
