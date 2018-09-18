@@ -2,7 +2,6 @@
 
 SECRET_KEY = 'tes$t'
 INSTALLED_APPS = [
-    'rest_framework',
     'tests.app'
     ]
 
