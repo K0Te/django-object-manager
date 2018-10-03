@@ -2,7 +2,7 @@ import os
 import django
 from django.test import TestCase
 
-from django_object_manager.object_manager import ObjManagerMixin
+from django_object_manager import ObjManagerMixin
 
 os.environ['DJANGO_SETTINGS_MODULE'] = 'tests.settings'  # noqa
 django.setup()  # noqa
@@ -12,6 +12,13 @@ from tests.app import models, tests
 
 class TestPlaneMake(ObjManagerMixin, TestCase):
     """Ensure that Object Manager can create objects."""
+
+    def test_namespace(self):
+        """Ensure that no extra objects leak into module namespace."""
+        import django_object_manager as om
+        names = list(sorted([name for name in dir(om)
+                             if not name.startswith('__')]))
+        assert names == ['ObjManagerMixin', 'ObjectManager']
 
     def test_multiple_predefined(self):
         """Ensure that multiple predefined objects can be created."""
