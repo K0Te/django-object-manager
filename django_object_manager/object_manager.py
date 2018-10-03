@@ -129,13 +129,14 @@ class ObjectManager:
         return instance
 
     def _create_foreing(self, field, value):
-        foreing_model = field.rel.to
+        foreing_model = field.remote_field.model
         name = foreing_model.__name__.lower()
         if isinstance(value, foreing_model):
             return value
         else:
             assert isinstance(value, str), \
                 'Related values must be either instances or str ids'
+            # TODO Use type to select related model, name can be misleading !
             return self._get_or_create(name,
                                        value,
                                        **self._data[name][value])
