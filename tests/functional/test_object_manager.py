@@ -79,13 +79,14 @@ class TestPlaneMake(ObjManagerMixin, TestCase):
                                              films=[film1, film2])
         self.assertEqual(models.FilmCategory.objects.count(), 1)
 
-    # def test_many_to_many_forward_predefined(self):
-    #     """Ensure that object with M2M relation can be created."""
-    #     film = self.object_manager.get_film(name='Memento',
-    #                                         year=2000,
-    #                                         uploaded_by='bob',
-    #                                         categories=['crime', 'drama'])
-    #     self.assertEqual(models.FilmCategory.objects.count(), 2)
-    #
+    def test_many_to_many_forward_predefined(self):
+        """Ensure that object with M2M relation can be created."""
+        film = self.object_manager.get_film(name='Memento',
+                                            year=2000,
+                                            uploaded_by='bob',
+                                            categories=['crime', 'drama'])
+        self.assertEqual(models.FilmCategory.objects.count(), 2)
+
+    # TODO
     # def test_customized(self):
     #     """Ensure that customized objects are not cached."""
