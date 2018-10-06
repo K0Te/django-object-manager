@@ -97,6 +97,8 @@ class ObjectManager:
                         args = \
                             {instance._meta.model.__name__.lower(): instance,
                              field.related_model.__name__.lower(): field_val}
+                        # Create dependency after main object, using
+                        # M2M "through" model
                         field.through(**args).save()
                     for related_val in params.pop(field.name):
                         post_add.append(partial(cb, field, related_val))
@@ -105,9 +107,19 @@ class ObjectManager:
                         setattr(field_val,
                                 instance._meta.model.__name__.lower(),
                                 instance)
+                        # Delay 1-to-1 dependency object creation
                         field_val.save()
                     val = params.pop(field.name)
                     post_add.append(partial(cb, val))
+                elif isinstance(field, ManyToManyField):
+                    def cb(field, field_val, instance):
+                        field_val.save()
+                        # Delay forward M2M dependency,
+                        # use RelatedManager helper
+                        # TODO no related manager if `through` model has extra attributes ?
+                        getattr(instance, field.name).add(field_val)
+                    for related_val in params.pop(field.name):
+                        post_add.append(partial(cb, field, related_val))
         return post_add
 
     def _get_or_create(self, _name, _key, _create_in_db=True, _custom=False,
@@ -118,6 +130,7 @@ class ObjectManager:
             return instance
         post_add = self._create_dependencies(model, kwargs)
         if _create_in_db:
+            print('###: ', kwargs)
             instance = model(**kwargs)
             instance.save(force_insert=True)
         else:
