@@ -11,7 +11,7 @@ with open(path.join(here, 'README.md'), encoding='utf-8') as f:
 
 setup(
     name='django-object-manager',
-    version='0.0.2',
+    version='0.0.4',
     description='Django object manager for tests',
     license='BSD',
     long_description=long_description,
@@ -29,9 +29,8 @@ setup(
     install_requires=['django'],
     setup_requires=['pytest-runner'],
     tests_require=['pytest', 'pytest-cov', 'pytest-django'],
-    test_suite='tests.functional',
-    packages=find_packages(exclude=['tests']),  # Required
-    project_urls={  # Optional
+    packages=find_packages(exclude=['tests']),
+    project_urls={
         'Bug Reports': 'https://github.com/K0Te/django-object-manager/issues',
         'Source': 'https://github.com/K0Te/django-object-manager',
     },
