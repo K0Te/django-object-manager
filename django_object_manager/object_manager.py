@@ -130,7 +130,6 @@ class ObjectManager:
             return instance
         post_add = self._create_dependencies(model, kwargs)
         if _create_in_db:
-            print('###: ', kwargs)
             instance = model(**kwargs)
             instance.save(force_insert=True)
         else:
