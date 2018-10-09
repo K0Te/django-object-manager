@@ -81,12 +81,23 @@ class TestPlaneMake(ObjManagerMixin, TestCase):
 
     def test_many_to_many_forward_predefined(self):
         """Ensure that object with M2M relation can be created."""
-        film = self.object_manager.get_film(name='Memento',
-                                            year=2000,
-                                            uploaded_by='bob',
-                                            categories=['crime', 'drama'])
+        self.object_manager.get_film(name='Memento',
+                                     year=2000,
+                                     uploaded_by='bob',
+                                     categories=['crime', 'drama'])
         self.assertEqual(models.FilmCategory.objects.count(), 2)
 
-    # TODO
-    # def test_customized(self):
-    #     """Ensure that customized objects are not cached."""
+    def test_inlined_object_creation(self):
+        """Ensure that nested object creation works."""
+        self.object_manager.get_film(
+            name='Memento',
+            year=2000,
+            uploaded_by=self.object_manager.get_user('bob'),
+            categories=['crime', 'drama'])
+        self.assertEqual(models.FilmCategory.objects.count(), 2)
+
+    def test_customized(self):
+        """Ensure that customized objects are not cached."""
+        user_1 = self.object_manager.get_user('bob', email='bob@bob.com')
+        user_2 = self.object_manager.get_user('bob', email='bob@bob.com')
+        self.assertTrue(user_1 is not user_2)
