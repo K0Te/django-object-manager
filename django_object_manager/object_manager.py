@@ -1,16 +1,7 @@
 from collections import namedtuple, defaultdict
+from copy import copy
 
-from django.db.models import (
-    ForeignKey,
-    ManyToManyRel,
-    OneToOneRel,
-    ManyToManyField)
-
-from .field_converters import (
-    create_foreign_key,
-    create_m2m_reverse,
-    create_one2one,
-    create_m2m_forward)
+from .field_converters import default_converters
 
 
 class ContextCallable:
@@ -38,10 +29,7 @@ class ObjectManager:
     def __init__(self):
         """Initialize object creator."""
         self._instances = defaultdict(dict)
-        self._converters = {ForeignKey: create_foreign_key,
-                            ManyToManyRel: create_m2m_reverse,
-                            ManyToManyField: create_m2m_forward,
-                            OneToOneRel: create_one2one}
+        self._converters = copy(default_converters)
 
     @classmethod
     def register(cls, model, data):
@@ -49,6 +37,11 @@ class ObjectManager:
         name = model.__name__.lower()
         cls._data[name] = data
         cls._registered_models[name] = model
+
+    @classmethod
+    def register_converter(cls, field_type, converter):
+        """Register new converter."""
+        cls._converters[field_type] = converter
 
     def __getattribute__(self, item):
         """Set context for object creation."""

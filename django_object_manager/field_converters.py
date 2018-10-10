@@ -3,6 +3,15 @@
 from functools import partial
 from collections import namedtuple
 
+from django.db.models import (
+    ForeignKey,
+    ManyToManyRel,
+    ManyToManyField,
+    OneToOneRel,
+)
+
+__all__ = ('default_converters',)
+
 FieldConverterResult = namedtuple('FieldConverterResult',
                                   'field_value post_actions pass_field_value')
 
@@ -85,3 +94,10 @@ def create_one2one(object_manager, field, value):
                                       **object_manager._data[name][value]),
         [partial(cb, value)],
         True)
+
+
+default_converters = {ForeignKey: create_foreign_key,
+                      ManyToManyRel: create_m2m_reverse,
+                      ManyToManyField: create_m2m_forward,
+                      OneToOneRel: create_one2one,
+                      }
