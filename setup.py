@@ -11,7 +11,7 @@ with open(path.join(here, 'README.md'), encoding='utf-8') as f:
 
 setup(
     name='django-object-manager',
-    version='0.0.5',
+    version='0.0.6',
     description='Django object manager for tests',
     license='BSD',
     long_description=long_description,

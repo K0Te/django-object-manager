@@ -114,7 +114,13 @@ class TestPlaneMake(ObjManagerMixin, TestCase):
                                                      parent_category=None)
         assert anime.parent_category is None
 
-    def test_one2one(self):
+    def test_one2one_forward(self):
         """Ensure that one2one field can be created."""
         bob = self.object_manager.get_user('bob', extra_info='extra_info_1')
         assert bob.extra_info.address == 'NY'
+
+    def test_one2one_reverse(self):
+        """Ensure that one2one field can be created."""
+        extra_info = self.object_manager.get_userextrainfo('extra_info_1',
+                                                           user='bob')
+        assert extra_info.user.name == 'Bob'

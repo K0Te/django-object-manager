@@ -89,9 +89,10 @@ def create_one2one(object_manager, field, value):
                 instance)
         # Delay 1-to-1 dependency object creation
         field_val.save()
+    value = object_manager._get_or_create(name, value, _create_in_db=False,
+                                          **object_manager._data[name][value])
     return FieldConverterResult(
-        object_manager._get_or_create(name, value, _create_in_db=False,
-                                      **object_manager._data[name][value]),
+        value,
         [partial(cb, value)],
         True)
 
