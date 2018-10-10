@@ -1,14 +1,11 @@
 from collections import namedtuple, defaultdict
-from datetime import datetime
 from functools import partial
 
 from django.db.models import (
     ForeignKey,
     ManyToManyRel,
-    DateTimeField,
     OneToOneRel,
     ManyToManyField)
-from pytz import utc
 
 
 class ContextCallable:
@@ -39,7 +36,6 @@ class ObjectManager:
         self._converters = {ForeignKey: self._create_foreing,
                             ManyToManyRel: self._create_m2m_rel,
                             ManyToManyField: self._create_m2m_field,
-                            DateTimeField: self._parse_datetime,
                             OneToOneRel: self._make1to1}
 
     @classmethod
@@ -106,8 +102,9 @@ class ObjectManager:
                 for (converter_type, converter) in self._converters.items():
                     if isinstance(field, converter_type):
                         # TODO use namedtuple here ?
-                        params[field.name], cbs, pop_params = converter(field,
+                        params[field.name], new_cbs, pop_params = converter(field,
                                                        params[field.name])
+                        cbs.extend(new_cbs)
                         if pop_params:
                             params.pop(field.name)
 
@@ -203,9 +200,6 @@ class ObjectManager:
             field_val.save()
         return self._get_or_create(name, value, _create_in_db=False,
                                    **self._data[name][value]), [partial(cb, value)], [], False
-
-    def _parse_datetime(self, _field, value):
-        return datetime.strptime(value, '%b %d %Y').replace(tzinfo=utc), [], False
 
 
 class ObjManagerMixin:
