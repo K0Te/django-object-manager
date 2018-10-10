@@ -29,7 +29,11 @@ class ObjectManager:
     def __init__(self):
         """Initialize object creator."""
         self._instances = defaultdict(dict)
-        self._converters = copy(default_converters)
+        self._converters = {ForeignKey: self._create_foreing,
+                            ManyToManyRel: self._create_m2m_rel,
+                            ManyToManyField: self._create_m2m_field,
+                            DateTimeField: self._parse_datetime,
+                            OneToOneRel: self._make1to1}
 
     @classmethod
     def register(cls, model, data):
@@ -99,7 +103,6 @@ class ObjectManager:
                     continue
                 for (converter_type, converter) in self._converters.items():
                     if isinstance(field, converter_type):
-                        # TODO use namedtuple here ?
                         result = converter(self, field, params[field.name])
                         post_actions.extend(result.post_actions)
                         if not result.pass_field_value:
