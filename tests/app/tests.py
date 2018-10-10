@@ -35,6 +35,16 @@ ObjectManager.register(
 ObjectManager.register(
     Film,
     {
+        'memento': {
+            'name': 'Memento',
+            'year': 2000,
+            'uploaded_by': 'bob',
+        },
+        'godfather': {
+            'name': 'The Godfather',
+            'year': 1974,
+            'uploaded_by': 'bob',
+        },
     })
 ObjectManager.register(
     UserExtraInfo,

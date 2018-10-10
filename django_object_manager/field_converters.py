@@ -34,8 +34,10 @@ def create_foreign_key(object_manager, field, value):
             **object_manager._data[name][value])
     return FieldConverterResult(value, post_actions, pass_field_value)
 
+
 # TODO M2M are similar, probably they can be combined
 def create_m2m_reverse(object_manager, field, values):
+
     def cb(field, field_val, instance):
         args = \
             {instance._meta.model.__name__.lower(): instance,
@@ -43,13 +45,28 @@ def create_m2m_reverse(object_manager, field, values):
         # Create dependency after main object, using
         # M2M "through" model
         field.through(**args).save()
+
+    foreing_model = field.related_model
+    name = foreing_model.__name__.lower()
+
+    def gen():
+        for value in values:
+            if isinstance(value, foreing_model):
+                yield value
+            else:
+                assert isinstance(value, str), \
+                    'Related values must be either instances or str ids'
+                yield object_manager._get_or_create(name,
+                                          value,
+                                          **object_manager._data[name][value])
+    res = list(gen())
     return FieldConverterResult(
         [],
-        [partial(cb, field, related_val) for related_val in values],
+        [partial(cb, field, related_val) for related_val in res],
         False)
 
 
-def create_m2m_forward(self, field, values):
+def create_m2m_forward(object_manager, field, values):
 
     def cb(field, field_val, instance):
         field_val.save()
@@ -67,12 +84,12 @@ def create_m2m_forward(self, field, values):
             else:
                 assert isinstance(value, str), \
                     'Related values must be either instances or str ids'
-                yield self._get_or_create(name,
-                                          value,
-                                          **self._data[name][value])
+                yield object_manager._get_or_create(name,
+                                                    value,
+                                                    **object_manager._data[name][value])
     res = list(gen())
     return FieldConverterResult(
-        res,
+        [],
         [partial(cb, field, related_val) for related_val in res],
         False)
 

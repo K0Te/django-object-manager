@@ -67,7 +67,7 @@ class TestPlaneMake(ObjManagerMixin, TestCase):
         self.assertEqual(film.uploaded_by.email, 'test@test.org')
         self.assertEqual(models.User.objects.count(), 1)
 
-    def test_many_to_many_reversed_predefined(self):
+    def test_many_to_many_reversed(self):
         """Ensure that object with M2M relation can be created."""
         film1 = self.object_manager.get_film(name='Memento',
                                              year=2000,
@@ -80,6 +80,13 @@ class TestPlaneMake(ObjManagerMixin, TestCase):
         self.assertEqual(models.FilmCategory.objects.count(), 1)
         assert film1 in category.films.all()
         assert film2 in category.films.all()
+
+    def test_many_to_many_reversed_predefined(self):
+        """Ensure that object with M2M relation can be created."""
+        category = self.object_manager.get_filmcategory(
+            'crime', films=['memento', 'godfather'])
+        self.assertEqual(models.FilmCategory.objects.count(), 1)
+        assert len(category.films.all()) == 2
 
     def test_many_to_many_forward_predefined(self):
         """Ensure that object with M2M relation can be created."""
