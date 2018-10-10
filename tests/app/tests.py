@@ -1,7 +1,7 @@
 """Tests helpers for application."""
 
 from django_object_manager.object_manager import ObjectManager
-from .models import User, Film, FilmCategory
+from .models import User, Film, FilmCategory, UserExtraInfo
 
 ObjectManager.register(
     User,
@@ -29,7 +29,17 @@ ObjectManager.register(
         },
         'anime': {
             'name': 'Anime',
-            'parent': 'serious',
+            'parent_category': 'serious',
         },
     })
-ObjectManager.register(Film, {})
+ObjectManager.register(
+    Film,
+    {
+    })
+ObjectManager.register(
+    UserExtraInfo,
+    {
+        'extra_info_1': {
+            'address': 'NY'
+        }
+    })

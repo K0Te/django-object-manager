@@ -34,21 +34,8 @@ def create_m2m_reverse(object_manager, field, values):
         # Create dependency after main object, using
         # M2M "through" model
         field.through(**args).save()
-    foreing_model = field.related_model
-    name = foreing_model.__name__.lower()
-
-    def gen():
-        for value in values:
-            if isinstance(value, foreing_model):
-                yield value
-            else:
-                assert isinstance(value, str), \
-                    'Related values must be either instances or str ids'
-                yield object_manager._get_or_create(name,
-                                                    value,
-                                                    **object_manager._data[name][value])
     return FieldConverterResult(
-        gen(),
+        [],
         [partial(cb, field, related_val) for related_val in values],
         False)
 
@@ -97,4 +84,4 @@ def create_one2one(object_manager, field, value):
         object_manager._get_or_create(name, value, _create_in_db=False,
                                       **object_manager._data[name][value]),
         [partial(cb, value)],
-        False)
+        True)

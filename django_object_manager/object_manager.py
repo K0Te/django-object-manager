@@ -113,6 +113,7 @@ class ObjectManager:
                             params.pop(field.name)
                         else:
                             params[field.name] = result.field_value
+                        break
         return post_actions
 
     def _get_or_create(self, _name, _key, _create_in_db=True, _custom=False,
