@@ -75,9 +75,11 @@ class TestPlaneMake(ObjManagerMixin, TestCase):
         film2 = self.object_manager.get_film(name='The Godfather',
                                              year=1974,
                                              uploaded_by='bob')
-        self.object_manager.get_filmcategory('crime',
-                                             films=[film1, film2])
+        category = self.object_manager.get_filmcategory('crime',
+                                                        films=[film1, film2])
         self.assertEqual(models.FilmCategory.objects.count(), 1)
+        assert film1 in category.films.all()
+        assert film2 in category.films.all()
 
     def test_many_to_many_forward_predefined(self):
         """Ensure that object with M2M relation can be created."""
@@ -101,3 +103,18 @@ class TestPlaneMake(ObjManagerMixin, TestCase):
         user_1 = self.object_manager.get_user('bob', email='bob@bob.com')
         user_2 = self.object_manager.get_user('bob', email='bob@bob.com')
         self.assertTrue(user_1 is not user_2)
+
+    def test_multiple_ending_in_ies(self):
+        """Ensure that model ending in 'y'->'ies' is supported."""
+        self.object_manager.get_filmcategories()
+
+    def test_overwrite_param_with_none(self):
+        """Ensure that parameter can be overwritten with None."""
+        anime = self.object_manager.get_filmcategory('anime',
+                                                     parent_category=None)
+        assert anime.parent_category is None
+
+    def test_one2one(self):
+        """Ensure that one2one field can be created."""
+        bob = self.object_manager.get_user('bob', extra_info='extra_info_1')
+        assert bob.extra_info.address == 'NY'

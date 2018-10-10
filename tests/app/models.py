@@ -1,10 +1,18 @@
 from django.db import models
+from django.db.models import SET_NULL
 
 
 class User(models.Model):
     id = models.AutoField('Identifier', primary_key=True)
     name = models.CharField('Name', max_length=70)
     email = models.EmailField()
+    extra_info = models.OneToOneField('UserExtraInfo',
+                                      null=True,
+                                      on_delete=SET_NULL)
+
+
+class UserExtraInfo(models.Model):
+    address = models.CharField('Address', max_length=128)
 
 
 class FilmCategory(models.Model):
