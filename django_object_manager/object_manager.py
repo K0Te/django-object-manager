@@ -29,11 +29,7 @@ class ObjectManager:
     def __init__(self):
         """Initialize object creator."""
         self._instances = defaultdict(dict)
-        self._converters = {ForeignKey: self._create_foreing,
-                            ManyToManyRel: self._create_m2m_rel,
-                            ManyToManyField: self._create_m2m_field,
-                            DateTimeField: self._parse_datetime,
-                            OneToOneRel: self._make1to1}
+        self._converters = copy(default_converters)
 
     @classmethod
     def register(cls, model, data):
