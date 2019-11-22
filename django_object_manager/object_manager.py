@@ -1,6 +1,8 @@
 from collections import namedtuple, defaultdict
 from copy import copy
 
+from django.db.models import ManyToManyRel, ManyToManyField
+
 from .field_converters import default_converters
 
 
@@ -79,12 +81,25 @@ class ObjectManager:
                 item_data = self._data[context.name][key].copy()
                 item_data.update(kwargs)
                 params = item_data
+                custom = self._is_custom(self._get_model(context.name),
+                                         **kwargs)
             except ValueError:
                 key = None
                 params = kwargs
+                custom = False
             return self._get_or_create(context.name, key,
-                                       _custom=bool(kwargs),
+                                       _custom=custom,
                                        **params)
+
+    def _get_model(self, name):
+        return self._registered_models[name]
+
+    def _is_custom(self, model, **kwargs):
+        fields = {field.name: field for field in model._meta.get_fields()}
+        for name in kwargs:
+            if not isinstance(fields[name], (ManyToManyField, ManyToManyRel)):
+                return True
+        return False
 
     def _get(self, _name, _key):
         if _key in self._instances[_name]:
@@ -110,7 +125,7 @@ class ObjectManager:
 
     def _get_or_create(self, _name, _key, _create_in_db=True, _custom=False,
                        **kwargs):
-        model = self._registered_models[_name]
+        model = self._get_model(_name)
         instance = self._get(_name, _key)
         if instance is not None and not _custom:
             return instance

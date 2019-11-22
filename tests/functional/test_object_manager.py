@@ -96,6 +96,15 @@ class TestPlaneMake(ObjManagerMixin, TestCase):
                                      categories=['crime', 'drama'])
         self.assertEqual(models.FilmCategory.objects.count(), 2)
 
+    def test_many_to_many_forward_cached(self):
+        """Ensure that object with M2M relation is cached."""
+        obj = self.object_manager.get_film('memento',
+                                           categories=['crime', 'drama'])
+        self.assertEqual(models.FilmCategory.objects.count(), 2)
+
+        other = self.object_manager.get_film('memento')
+        self.assertTrue(obj is other)
+
     def test_inlined_object_creation(self):
         """Ensure that nested object creation works."""
         self.object_manager.get_film(
